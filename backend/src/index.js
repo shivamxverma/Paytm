@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import pool from './db';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 dotenv.config({});
 
@@ -17,7 +17,6 @@ async function startServer() {
     app.use(cors(corsOptions));
     app.use(express.json());
     app.use(cookieParser());
-    app.use();
     app.listen(port, () => {
 
         console.log(`Server is started at ${port}`);

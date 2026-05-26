@@ -1,66 +1,51 @@
-import db from '../../db';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-
-const accessTokenSecret = process.env.ACCESSTOKEN_SECRET;
-const refreshTokenSecret = process.env.REFRESHTOKEN_SECRET;
-
-const pool = db;
-
-function returnTokens(userData) {
-    const accessToken = jwt.sign(userData,accessTokenSecret, {expiresIn: '15m'});
-    const refreshToken = jwt.sign(userData,refreshTokenSecret, {expiresIn: '7d'});
-    return {
-        accessToken,
-        refreshToken
-    }
-}
+import bcrypt from "bcryptjs";
+import prisma from '../../db/prisma';
+import { returnTokens } from './auth-service.js';
 
 export async function handleEmailPasswordRegister(userData) {
-    const { email, password, role } = userData;
+    const user = await prisma.user.findUnique({
+        where: {
+            email: userData.email
+        }
+    });
 
-    const checkUserExistQuery = `
-        SELECT * from users where email = $1;
-    `;
-
-    const result = await pool.query(checkUserExistQuery, [email]);
-
-    if(result.rows.length > 0) {
-        throw new Error("User with this email already exists");
+    if (user) {
+        throw new Error("User with this Email Already Exist");
     }
 
     const salt = await bcrypt.genSalt(10);
-    const passwordhash = await bcrypt.hash(password, salt);
+    const hashPassword = await bcrypt.hash(userData.password, salt);
 
-    const insertQuery = `
-        INSERT INTO users (email, password, role)
-        VALUES ($1, $2, $3)
-        RETURNING id, email , role; 
-    `
+    const newUser = await prisma.user.create({
+        data: {
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+            password: hashPassword
+        }
+    });
 
-    const values = [email, passwordhash, role];
+    if (!newUser) {
+        throw new Error("Error on Creating New User");
+    }
 
-    const insertresult = await pool.query(insertQuery,values);
-
-
-    return insertResult.rows[0];
-} 
+    return newUser;
+}
 
 export async function handleEmailPasswordLogin(userData) {
     const { email, password } = userData;
 
-    const checkUserExistQuery = `
-        SELECT * from users where email = $1;
-    `;
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const result = await pool.query(checkUserExistQuery, [email]);
+    const user = await prisma.user.findUnique({
+        where: {
+            email: email
+        }
+    });
 
-
-    if (result.rows.length === 0) {
+    if (!user) {
         throw new Error("User does not exist");
     }
-
-    const user = result.rows[0];
 
     const compareresult = await bcrypt.compare(password, user.password);
 
@@ -69,18 +54,25 @@ export async function handleEmailPasswordLogin(userData) {
     }
 
     const tokenPayload = {
-        id : user.id,
-        email : user.email,
-        role : user.role
-    }
-
-    const {accessToken, refreshToken} = returnTokens(tokenPayload);
-
-    const cookieOptions = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // true in production
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName
     };
+
+    const { accessToken, refreshToken } = await returnTokens(tokenPayload);
+
+    // Save the refreshToken into user Table 
+
+    await prisma.user.update({
+        where: {
+            email: userData.email
+        },
+
+        data: {
+            token: refreshToken
+        }
+    });
 
     return {
         user: tokenPayload,
