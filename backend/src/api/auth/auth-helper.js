@@ -3,9 +3,11 @@ import prisma from '../../db/prisma.js';
 import { returnTokens } from './auth-service.js';
 
 export async function handleEmailPasswordRegister(userData) {
+    const normalizedEmail = userData.email.trim().toLowerCase();
+
     const user = await prisma.user.findUnique({
         where: {
-            email: userData.email
+            email: normalizedEmail
         }
     });
 
@@ -20,7 +22,7 @@ export async function handleEmailPasswordRegister(userData) {
         data: {
             firstName: userData.firstName,
             lastName: userData.lastName,
-            email: userData.email,
+            email: normalizedEmail,
             password: hashPassword
         }
     });
@@ -39,7 +41,7 @@ export async function handleEmailPasswordLogin(userData) {
 
     const user = await prisma.user.findUnique({
         where: {
-            email: email
+            email: normalizedEmail
         }
     });
 
@@ -66,7 +68,7 @@ export async function handleEmailPasswordLogin(userData) {
 
     await prisma.user.update({
         where: {
-            email: userData.email
+            email: normalizedEmail
         },
 
         data: {

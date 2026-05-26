@@ -1,16 +1,33 @@
-import prisma from "../../db/prisma"
+import prisma from "../../db/prisma.js"
 
 export const handleGetUser = async(userId) => {
     const user = await prisma.user.findUnique({
         where: {
             id : userId
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            createdAt: true,
+            updatedAt: true
         }
     })
     return user;
 }
 
 export const handleGetAllUser = async() => {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            createdAt: true,
+            updatedAt: true
+        }
+    });
     return users;
 }
 

@@ -25,7 +25,7 @@ export const transferMoney = async (req, res) => {
         const response = await handleTransferMoney(req.user.id, userId, balance);
 
         return res.status(200).json({
-            message: "Money is Transferd Successfully !",
+            message: "Money is Transferred Successfully !",
             success: true,
             data: response
         });

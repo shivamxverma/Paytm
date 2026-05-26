@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import { verifyJWT } from '../../shared/middleware';
+import { verifyJWT } from '../../shared/middleware.js';
 import { getMe, getUser, getAllUser, searchUsers } from './user-controller.js';
 const router = Router();
 

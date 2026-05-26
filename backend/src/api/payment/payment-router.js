@@ -1,6 +1,6 @@
 import {Router} from 'express';
-import { verifyJWT } from '../../shared/middleware';
-import { addMoney, transferMoney, getTransactions } from './payment-controller';
+import { verifyJWT } from '../../shared/middleware.js';
+import { addMoney, transferMoney, getTransactions } from './payment-controller.js';
 import { AddMoneySchema, TranferMoneySchema } from './payment-schema.js';
 import validate from '../../shared/validate.js';
 
