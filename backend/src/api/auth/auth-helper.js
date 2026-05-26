@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import prisma from '../../db/prisma';
+import prisma from '../../db/prisma.js';
 import { returnTokens } from './auth-service.js';
 
 export async function handleEmailPasswordRegister(userData) {

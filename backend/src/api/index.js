@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authRouter from './auth/auth-router.js';
-import paymentRouter from './'
+import paymentRouter from './payment/payment-router.js';
 
 const router = Router();
 

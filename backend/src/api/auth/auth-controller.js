@@ -1,4 +1,4 @@
-import { handleEmailPasswordRegister, handleEmailPasswordLogin } from './auth-helper';
+import { handleEmailPasswordRegister, handleEmailPasswordLogin } from './auth-helper.js';
 import { cookieOptions } from './auth-service.js';
 
 export async function EmailPasswordRegister(req , res) {

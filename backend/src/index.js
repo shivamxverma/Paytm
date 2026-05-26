@@ -1,8 +1,8 @@
+import 'dotenv/config';
 import express from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-dotenv.config({});
+import router from './api/index.js';
 
 const corsOptions = {
     origin: 'http://localhost:5173',
@@ -17,6 +17,7 @@ async function startServer() {
     app.use(cors(corsOptions));
     app.use(express.json());
     app.use(cookieParser());
+    app.use('/api/v1', router);
     app.listen(port, () => {
 
         console.log(`Server is started at ${port}`);
