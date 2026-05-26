@@ -6,6 +6,6 @@ const pool = new Pool({
     database: "courseapp",
     password: "password",
     port: 5432
-})
+});
 
 export default pool;

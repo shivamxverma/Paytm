@@ -1,12 +1,16 @@
 import { Router } from 'express';
+import authRouter from './auth/auth-router.js';
+import paymentRouter from './'
 
 const router = Router();
 
 const routes = [
-    { path : '/auth' , route: 'authRouter'}
+    { path : '/auth' , route: authRouter},
+    { path : '/payment' , route: paymentRouter}
 ]
 
+routes.forEach((r) => {
+    router.use(r.path, r.route);
+});
 
-routes.forEach(
-
-)
+export default router;
